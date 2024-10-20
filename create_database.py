@@ -1,3 +1,8 @@
+###############################################################################
+# Author : Mukesh Baphna
+#
+# Purpose : ingest PDF or text documents (Files, Folders) into Vector DB
+###############################################################################
 #import pdb
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.schema import Document
@@ -36,15 +41,6 @@ def generate_data_store(file_path="", directory_path=""):
         raise ValueError("Either file path or directory path must be provided.")
 
 
-def generate_olddata_store():
-    documents = load_documents()
-    chunks = split_text(documents)
-    persist_to_chroma(chunks)
-
-    documents = load_pdf_documents()  # Load PDF documents
-    chunks = split_pdf(documents)    # Split documents into chunks
-    persist_to_chroma(chunks, clear_db=False)            # Save chunks to ChromaDB
-
 def load_single_pdf(filename=""):
     # Create an empty list to store documents
     documents = []
@@ -53,7 +49,7 @@ def load_single_pdf(filename=""):
         # Load and extract text from each PDF file
         # file_path = os.path.join(DATA_PATH, filename)
         file_path = filename
-        #print(f"Chunking File: {file_path}")
+        #print(f"Chunking a File: {file_path}")
         with open(file_path, "rb") as f:
             reader = PdfReader(f)
             pdf_text = ""
@@ -74,7 +70,7 @@ def load_pdf_documents(dirname=""):
         if filename.endswith(".pdf"):
             # Load and extract text from each PDF file
             file_path = os.path.join(dirname, filename)
-            #print(f"Chunking File in Directory: {file_path}")
+            #print(f"Chunking Files in Folder/Directory: {file_path}")
             with open(file_path, "rb") as f:
                 reader = PdfReader(f)
                 pdf_text = ""
@@ -95,7 +91,7 @@ def split_pdf(documents):
     return chunks
 
 
-# you can also use following code to load txt/md files
+# code to tokenize, vectorize and ingest txt md files
 def load_documents():
     loader = DirectoryLoader(DATA_PATH, glob="*.md")
     documents = loader.load()
@@ -110,7 +106,7 @@ def split_text(documents: list[Document]):
         add_start_index=True,
     )
     chunks = text_splitter.split_documents(documents)
-    print(f"Split {len(documents)} documents into {len(chunks)} chunks.")
+    print(f"Split {len(documents)} documents into {len(chunks)} distinct chunks.")
 
     return chunks
 
@@ -126,8 +122,8 @@ def persist_to_chroma(chunks: list[Document], clear_db: bool = True):
     db = Chroma.from_documents(
         chunks, embedding_function, persist_directory=CHROMA_PATH
     )
-    db.persist()
-    print(f"Saved {len(chunks)} chunks to {CHROMA_PATH}.")
+    #db.persist()
+    print(f"Saved {len(chunks)} distinct chunks to {CHROMA_PATH}.")
 
 
 if __name__ == "__main__":

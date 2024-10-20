@@ -25,7 +25,7 @@ Please answer the question based only on the context: {question}
 
 
 
-def get_query_result(query_text: str) -> str:
+def get_response(query_text: str) -> str:
     """
     Takes a query provided by user, searched ChromaDB that has stored all PDF files with their embeddings, and returns a response.
     
@@ -62,7 +62,7 @@ def get_query_result(query_text: str) -> str:
     sources = [doc.metadata.get("source", None) for doc, _score in results]
     
     # Format the final response
-    formatted_response = f"Response: {response_text}\nSources: {sources}"
+    formatted_response = f"Response: {response_text}\n"
     return formatted_response
 
 def main():
